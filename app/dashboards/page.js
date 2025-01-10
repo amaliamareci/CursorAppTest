@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useApiKeys } from '@/lib/hooks/useApiKeys';
 import { CurrentPlan } from '@/app/components/dashboard/CurrentPlan';
 import { CreateKeyModal } from '@/app/components/dashboard/CreateKeyModal';
@@ -7,6 +8,7 @@ import { ApiKeysList } from '@/app/components/dashboard/ApiKeysList';
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
   const {
     apiKeys,
     error,
@@ -18,6 +20,13 @@ export default function Dashboard() {
   } = useApiKeys();
 
   useEffect(() => {
+    // Check if user is logged in
+    const user = localStorage.getItem('user');
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    
     fetchApiKeys();
   }, []);
 

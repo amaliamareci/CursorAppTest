@@ -1,9 +1,32 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUserEmail(user.email);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem('user');
+    
+    // Clear cookie
+    document.cookie = 'user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    
+    router.push('/login');
+  };
 
   return (
     <div className="relative">
@@ -114,14 +137,36 @@ export default function Sidebar() {
 
         {/* User Profile */}
         <div className="absolute bottom-0 w-64 p-4 border-t border-gray-200">
-          <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-gray-200 mr-3 overflow-hidden">
-              {/* Add user avatar image here if available */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-8 h-8 rounded-full bg-gray-200 mr-3 overflow-hidden flex items-center justify-center">
+                <svg 
+                  className="w-5 h-5 text-gray-500" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-gray-900">{userEmail}</div>
+                <div className="text-xs text-gray-500">User</div>
+              </div>
             </div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-gray-900">Eden Marco</div>
-              <div className="text-xs text-gray-500">Settings</div>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 text-gray-600 hover:text-gray-900"
+              title="Logout"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
